@@ -741,6 +741,10 @@ elif [ -n "$apt" ]; then
     sudo update-rc.d isc-dhcp-server enable
 fi
 
+# Ubuntu 24.04 takes way too long to boot when it's waiting for a network it doesn't understand.
+# Probably can't hurt on other platforms as well
+sudo systemctl disable systemd-networkd-wait-online.service
+
 # Save default iptables rule if both network devices detected
 if [ "$internal_net" != "LAN_DEVICE" ] && [ "$external_net" !=  "WAN_DEVICE" ] ; then
     # LAN and WAN devices are already configured.  Load passthrough iptables rule

@@ -430,8 +430,8 @@ while [ -z "$mitmproxy_ok" ]; do
     # ruamel-yaml.  We can't count on this being fixed.
     unset miniconda_python
   else
-    # Check if the miniconda python3.7 binary exists
-    if [ ! -f ~/miniconda/bin/python3.7 ]; then
+    # Check if the miniconda python3.8 binary exists
+    if [ ! -f ~/miniconda/bin/python3.8 ]; then
         # install miniconda
         if [ "$arch" == "x86_64" ]; then
             echo "Installing x86_64 miniconda..."
@@ -445,9 +445,9 @@ while [ -z "$mitmproxy_ok" ]; do
             miniconda_python=1
         fi
         if [ -f ~/miniconda/bin/python3 ]; then
-          # We don't have a python3.7 to run.
+          # We don't have a python3.8 to run.
           # Miniconda is a moving target, and I don't like this.  But YOLO.
-          ln -s ~/miniconda/bin/python3 ~/miniconda/bin/python3.7
+          ln -s ~/miniconda/bin/python3 ~/miniconda/bin/python3.8
         fi
         if [ -d /etc/ld.so.conf.d ]; then
           # PyQt5 will require that libxcb-util.so.1 exists.
@@ -470,29 +470,29 @@ while [ -z "$mitmproxy_ok" ]; do
 
   if [ -z "$miniconda_python" ]; then
       # No miniconda (e.g. Raspberry Pi), so standard Python install
-      python37=$(which python3.7 2> /dev/null)
+      python38=$(which python3.8 2> /dev/null)
 
-      if [ -z "$python37" ]; then
-          mkdir -p ~/in
-          pushd ~/in
-          rm -f Python-3.7.13.tgz
-          rm -rf Python-3.7.13
-          curl -OL https://www.python.org/ftp/python/3.7.13/Python-3.7.13.tgz
-          tar xavf Python-3.7.13.tgz
-          pushd Python-3.7.13/
-          ./configure --prefix=/usr/local && sudo make altinstall
-          if [ $? -ne 0 ]; then
-            echo "Error building python 3.7. Please check errors and try again."
-            exit 1
-          fi
-          popd; popd
+      if [ -z "$python38" ]; then
+        mkdir -p ~/in
+        pushd ~/in
+        rm -f Python-3.8.19.tgz
+        rm -rf Python-3.8.19
+        curl -OL https://www.python.org/ftp/python/3.8.19/Python-3.8.19.tgz
+        tar xavf Python-3.8.19.tgz
+        pushd Python-3.8.19/
+        ./configure --prefix=/usr/local && sudo make altinstall
+        if [ $? -ne 0 ]; then
+          echo "Error building python 3.8. Please check errors and try again."
+          exit 1
+        fi
+        popd; popd
       fi
 
       if [ -n "$zypper" ]; then
-        if [ -d /usr/local/lib64/python3.7/lib-dynload/ ]; then
+        if [ -d /usr/local/lib64/python3.8/lib-dynload/ ]; then
           echo "Fixing OpenSUSE bug with python outside of /usr/local"
           # https://bugs.python.org/issue34058
-          sudo ln -s /usr/local/lib64/python3.7/lib-dynload/ /usr/local/lib/python3.7/lib-dynload
+          sudo ln -s /usr/local/lib64/python3.8/lib-dynload/ /usr/local/lib/python3.8/lib-dynload
         fi
       fi
 
@@ -537,17 +537,17 @@ while [ -z "$mitmproxy_ok" ]; do
 
       export PATH="$HOME/miniconda/bin:$PATH"
 
-      python37=$(which python3.7 2> /dev/null)
+      python38=$(which python3.8 2> /dev/null)
 
-      if [ -z "$python37" ]; then
-          # Python 3.7 binary is there, but not in path
+      if [ -z "$python38" ]; then
+          # Python 3.8 binary is there, but not in path
           export PATH="$HOME/miniconda/bin:$PATH"
-          python37=$(which python3.7 2> /dev/null)
+          python38=$(which python3.8 2> /dev/null)
       fi
 
 
-      if [ -z "$python37" ]; then
-          echo "python 3.7 not found in path. Please check miniconda installation."
+      if [ -z "$python38" ]; then
+          echo "python 3.8 not found in path. Please check miniconda installation."
           echo "Simply removing the ~/miniconda directory can allow for a clean installation."
           exit 1
       fi
@@ -593,16 +593,16 @@ while [ -z "$mitmproxy_ok" ]; do
   # Confirm pip is there
   if [ -z "$miniconda_python" ]; then
       # No miniconda (e.g. Raspberry Pi), so standard Python install
-      mypip=$(which pip3.7 2> /dev/null)
+      mypip=$(which pip3.8 2> /dev/null)
       if [ -z "$mypip" ]; then
-        # The detected python 3.7 was not one we compiled/installed
-        # There's probably not a "pip3.7" binary
-        echo Using already-installed python 3.7
+        # The detected python 3.8 was not one we compiled/installed
+        # There's probably not a "pip3.8" binary
+        echo Using already-installed python 3.8
         mypip=$(which pip3 2> /dev/null)
         pipver=$($mypip -V)
         echo Found pip version $pipver
-        if [[ "$pipver" != *"3.7"* ]]; then
-          echo pip for python 3.7 not found!
+        if [[ "$pipver" != *"3.8"* ]]; then
+          echo pip for python 3.8 not found!
           unset $mypip
         fi
       fi
@@ -614,7 +614,7 @@ while [ -z "$mitmproxy_ok" ]; do
   fi
 
   if [ -z "$mypip" ]; then
-      "python 3.7 not found in path. Please check miniconda installation."
+      "python 3.8 not found in path. Please check miniconda installation."
       exit 1
   fi
 
@@ -661,18 +661,16 @@ while [ -z "$mitmproxy_ok" ]; do
   else
       # system-wide installed python
       sudo $mypip install colorama pyshark GitPython
+      # pip is a moving target and everything is terrible
+      # https://techoverflow.net/2022/04/07/how-to-fix-jupyter-lab-importerror-cannot-import-name-soft_unicode-from-markupsafe/
+      # https://stackoverflow.com/questions/77213053/why-did-flask-start-failing-with-importerror-cannot-import-name-url-quote-fr
+      sudo $mypip install markupsafe==2.0.1 "werkzeug<3.0"
+      sudo $mypip install mitmproxy pyshark
+      # Clean up old user-specific mitmproxy
+      rm ~/.local/bin/mitm*
+      
 
       if [ "$arch" == "aarch64" ]; then
-        # mitmproxy crashes on Python 3.7 on aarch64. Nobody knows why.
-        # Just use system-wide python3 to get mitmproxy here.
-        sudo pip3 install mitmproxy pyshark
-
-        if [ $? -ne 0 ]; then
-          echo "We're going to have to do a split install of Python code... :-/"
-          $mypip install mitmproxy pyshark
-          # pip is a moving target and everything is terrible
-          # https://techoverflow.net/2022/04/07/how-to-fix-jupyter-lab-importerror-cannot-import-name-soft_unicode-from-markupsafe/
-          $mypip install markupsafe==2.0.1
           sudo apt install -y python3-pyqt5
           if [ $? -ne 0 ]; then
             echo "Cannot figure out how to get PyQt5 on this platform. You're on your own here..."
@@ -680,20 +678,12 @@ while [ -z "$mitmproxy_ok" ]; do
             echo "We've gotten PyQt5 via APT. No need to manually install it"
             unset pyqt5
             echo "Overriding shebang in python code that uses PyQt5 to use system-wide python3"
-            sed -i.bak -e 's/#!\/usr\/bin\/env python3.7/#!\/usr\/bin\/env python3/' tapioca.py
-            sed -i.bak -e 's/#!\/usr\/bin\/env python3.7/#!\/usr\/bin\/env python3/' noproxy.py
-            sed -i.bak -e 's/#!\/usr\/bin\/env python3.7/#!\/usr\/bin\/env python3/' proxy.py
-            sed -i.bak -e 's/#!\/usr\/bin\/env python3.7/#!\/usr\/bin\/env python3/' ssltest.py
-            sed -i.bak -e 's/#!\/usr\/bin\/env python3.7/#!\/usr\/bin\/env python3/' tcpdump.py
+            sed -i.bak -e 's/#!\/usr\/bin\/env python3.8/#!\/usr\/bin\/env python3/' tapioca.py
+            sed -i.bak -e 's/#!\/usr\/bin\/env python3.8/#!\/usr\/bin\/env python3/' noproxy.py
+            sed -i.bak -e 's/#!\/usr\/bin\/env python3.8/#!\/usr\/bin\/env python3/' proxy.py
+            sed -i.bak -e 's/#!\/usr\/bin\/env python3.8/#!\/usr\/bin\/env python3/' ssltest.py
+            sed -i.bak -e 's/#!\/usr\/bin\/env python3.8/#!\/usr\/bin\/env python3/' tcpdump.py
           fi
-
-        fi
-
-        # We also will make a fake "python3.7" link to the system-wide python3
-        # Again, YOLO
-        sudo ln -s $(which python3) /usr/local/bin/python3.7
-      else
-        sudo $mypip install mitmproxy
       fi
 
       # pip is a moving target and everything is terrible
@@ -715,7 +705,7 @@ while [ -z "$mitmproxy_ok" ]; do
           echo yes | sudo sip-install
           if [ $? -ne 0 ]; then
             # Everything is broken. https://stackoverflow.com/questions/75671456/error-installing-pyqt5-under-aarch64-architecture
-            echo "*** Even sip-install for PyQt5 has failed! You'll have to figure out how to get PyQt5 installed for $python37 ***"
+            echo "*** Even sip-install for PyQt5 has failed! You'll have to figure out how to get PyQt5 installed for $python38 ***"
           fi
           popd
         fi

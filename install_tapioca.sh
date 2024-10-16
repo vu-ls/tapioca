@@ -650,7 +650,9 @@ while [ -z "$mitmproxy_ok" ]; do
       fi
 
       if [ -n "$pyqt5" ]; then
-        $mypip install PyQt5
+        #$mypip install PyQt5
+        echo "Installing PyQt5 via conda, since we have miniconda..."
+        conda install -y pyqt
         if [ $? -ne 0 ]; then
           echo "Problem installing PyQt5 with $mypip. Retrying without miniconda..."
           rm -rf ~/miniconda

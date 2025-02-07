@@ -83,12 +83,14 @@ def generate_report(app, pcapfile=''):
         # For each target (unsorted)
 
         for sslversion in net.sslversions:
+            if sslversion == 'TLS 1.3':
+                sslversion = color.bright(color.green(sslversion))
             if sslversion == 'TLS 1.2':
                 sslversion = color.bright(color.green(sslversion))
             else:
                 failedtest = True
                 failedreasons.append(
-                    '%s is used, rather than TLS 1.2' % sslversion)
+                    '%s is used, rather than TLS 1.3 or 1.2' % sslversion)
                 sslversion = color.bright(color.red(sslversion))
             print(sslversion)
             print(color.bright('Hosts using %s:' %
@@ -159,12 +161,14 @@ def generate_report(app, pcapfile=''):
 
         # For each target (unsorted)
         for dtlsversion in net.dtlsversions:
+            if dtlsversion == 'DTLS 1.3':
+                dtlsversion = color.bright(color.green(dtlsversion))
             if dtlsversion == 'DTLS 1.2':
                 dtlsversion = color.bright(color.green(dtlsversion))
             else:
                 failedtest = True
                 failedreasons.append(
-                    '%s is used, rather than DTLS 1.2' % dtlsversion)
+                    '%s is used, rather than DTLS 1.3 or 1.2' % dtlsversion)
                 dtlsversion = color.bright(color.red(dtlsversion))
             print(dtlsversion)
             print(color.bright('Hosts using %s:' %

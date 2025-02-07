@@ -307,7 +307,9 @@ def get_ssl_info(pkt):
             sslversions = addonlynew(
                 sslversions, sslversion, sslhost)
 
-            if str(sslversion) == 'TLS 1.2':
+            if str(sslversion) == 'TLS 1.3':
+                sslversion = color.green(sslversion)
+            elif str(sslversion) == 'TLS 1.2':
                 sslversion = color.green(sslversion)
             else:
                 sslversion = color.red(sslversion)
@@ -422,6 +424,8 @@ def get_dtls_info(pkt):
             dtlsversions = addonlynew(
                 dtlsversions, dtlsversion, dtlshost)
 
+            if str(dtlsversion) == 'DTLS 1.3':
+                dtlsversion = color.green(dtlsversion)
             if str(dtlsversion) == 'DTLS 1.2':
                 dtlsversion = color.green(dtlsversion)
             else:

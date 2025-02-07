@@ -752,8 +752,17 @@ while [ -z "$mitmproxy_ok" ]; do
           cd PyQt5-5.15.7
           echo yes | sudo sip-install
           if [ $? -ne 0 ]; then
-            # Everything is broken. https://stackoverflow.com/questions/75671456/error-installing-pyqt5-under-aarch64-architecture
-            echo "*** Even sip-install for PyQt5 has failed! You'll have to figure out how to get PyQt5 installed for $python38 ***"
+            # Of course things won't just compile by default
+            sed -i.bak -e "s/Q_PID pid() const;/qint64 pid() const;/" ~/in/PyQt5-5.15.7/sip/QtCore/qprocess.sip
+            echo yes | sudo /usr/local/bin/sip-install
+            if [ $? -ne 0 ]; then
+              # Maybe sip-install isn't in the path
+              echo yes | sudo /usr/local/bin/sip-install              
+              if [ $? -ne 0 ]; then
+                # Everything is broken. https://stackoverflow.com/questions/75671456/error-installing-pyqt5-under-aarch64-architecture
+                echo "*** Even sip-install for PyQt5 has failed! You'll have to figure out how to get PyQt5 installed for $python38 ***"
+              fi
+            fi
           fi
           popd
         fi

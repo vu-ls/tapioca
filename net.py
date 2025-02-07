@@ -272,7 +272,7 @@ def get_ssl_info(pkt):
 
     try:
         # Assume SSLv3 or TLS
-        sslpkt = pkt.ssl
+        sslpkt = pkt.tls
         sslpacketcount = sslpacketcount + 1
         handshake = sslpkt.handshake
         if handshake == 'Handshake Protocol: Client Hello':
@@ -324,7 +324,7 @@ def get_ssl_info(pkt):
         elif handshake == 'Handshake Protocol: Server Hello':
             sslhost = get_source_host(pkt)
             #print('Server hello!')
-            negotiated_ciphersuite = pkt.ssl.handshake_ciphersuite.showname
+            negotiated_ciphersuite = pkt.tls.handshake_ciphersuite.showname
             negotiated_ciphersuite = extract_notab_property(
                 negotiated_ciphersuite, 'Cipher Suite')
             # print('*** Negotiated SSL/TLS ciphersuite: %s' %
@@ -342,7 +342,7 @@ def get_ssl_info(pkt):
     except AttributeError:
         # SSLv2 doesn't have "handshake" structure
         try:
-            sslpkt = pkt.ssl
+            sslpkt = pkt.tls
             sslhost = get_host_contacted(pkt)
             if sslpkt.record == 'SSLv2 Record Layer: Client Hello':
                 sslversion = 'SSLv2'
@@ -367,7 +367,7 @@ def get_ssl_info(pkt):
                             print('%s: %s' %
                                   ('Client-supported cipher spec', ciphersuite))
             elif sslpkt.record == 'SSLv2 Record Layer: Server Hello':
-                negotiated_cipherspec = pkt.ssl.handshake_cipherspec.showname
+                negotiated_cipherspec = pkt.tls.handshake_cipherspec.showname
                 negotiated_cipherspec = extract_notab_property(
                     negotiated_cipherspec, 'Cipher Spec')
                 if negotiated_cipherspec not in negotiatedciphers:

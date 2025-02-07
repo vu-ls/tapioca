@@ -616,8 +616,11 @@ while [ -z "$mitmproxy_ok" ]; do
       pushd wireshark-2.6.20/
       ./configure && make && sudo make install
       if [ $? -ne 0 ]; then
+        PYTHON=$python38 ./configure && make && sudo make install
+        if [ $? -ne 0 ]; then
           echo "Error building Wireshark. Please check errors and try again."
           exit 1
+        fi
       fi
       if [ "$ID" = "raspbian" ]; then
           # Wireshark install on raspbian doesn't colorize by default.

@@ -90,7 +90,7 @@ def check_app(app):
                         request = color.bright(color.red((request)))
                         print(request)
                 else:
-                    print('No HTTPS traffic detected for app %s' % app)
+                    print('No unvalidated HTTPS traffic detected for app %s' % app)
                     ssl_passed.append(app)
             except FlowReadException as e:
                 print("Flow file corrupted: {}".format(e))

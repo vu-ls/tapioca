@@ -176,8 +176,29 @@ fi
 
 if [ -n "$yum" ]; then
     #EL and not Fedora
+    if [ -n "$PLATFORM_ID" ]; then
+      RHELVER=$(echo $PLATFORM_ID | awk -F'el' '{print $2}')
+      echo "Detected RHEL / CentOS version $RHELVER ($PLATFORM_ID)"
+    else
+      RHELVER=$(echo "$VERSION" | grep -oP '^[0-9]+')
+      echo "Detected RHEL / CentOS version $RHELVER ($VERSION)"
+    fi
+      
     sudo yum makecache
     sudo yum -y install epel-release
+    if [ $? -ne 0 ]; then
+      # Of course things have to be a moving target. Why make things easy when you can choose not to?
+      sudo yum config-manager --set-enabled crb
+      sudo subscription-manager repos --enable codeready-builder-for-rhel-$RHELVER-$(arch)-rpms
+      if [ "$RHELVER" -eq 7 ]; then
+        # Weird for a "noarch" RPM to live in an x86_64 directory, but whatevs...
+        sudo yum install -y https://archives.fedoraproject.org/pub/archive/epel/7/x86_64/Packages/e/epel-release-7-14.noarch.rpm
+        sudo subscription-manager repos --disable=rhel-7-server-e4s-optional-rpms
+        sudo subscription-manager repos --disable=rhel-7-server-eus-optional-rpms
+      else
+        sudo yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-$RHELVER.noarch.rpm
+      fi
+    fi
     sudo yum -y groupinstall "Development tools" "Server with GUI" xfce "Development Libraries"
     if [ $? -ne 0 ]; then
       # Centos 8 has moved some stuff around
@@ -194,7 +215,11 @@ if [ -n "$yum" ]; then
 
     if [ "$ID" != "fedora" ]; then
       # RHEL / CentOS have an ancient Wireshark.  We'll need to build our own.
-      tshark="/usr/local/bin/tshark"
+      if [ -n "$RHELVER" ] && [ "$RHELVER" -gt 7 ]; then
+        tshark=$(which tshark)
+      else
+        tshark="/usr/local/bin/tshark"
+      fi
     fi
 fi
 
@@ -244,6 +269,8 @@ elif [ -n "$yum" ]; then
     sudo yum -y install snappy-devel
     sudo yum -y install csnappy-devel
     sudo yum -y install libnghttp2-devel
+    sudo yum -y install GeoIP-devel 
+    sudo yum -y install libpcap-devel 
     if [ $? -ne 0 ]; then
       echo We probably have CentOS Stream here.  Installing from PowerTools...
       sudo dnf -y --enablerepo=powertools install libnghttp2-devel
@@ -253,7 +280,7 @@ elif [ -n "$yum" ]; then
     bind-utils nano chromium wget net-tools telnet xdotool nmap xterm \
     tmux iptables-services iw hostapd mousepad tk-devel \
     glib2-devel gnutls-devel c-ares-devel libcap-devel \
-    GeoIP-devel libnl3-devel libpcap-devel libffi-devel \
+    libnl3-devel libffi-devel \
     conntrack-tools qt5-qtbase-devel qt5-linguist \
     libgcrypt-devel xclip wireshark
     if [ $? -ne 0 ]; then
@@ -331,8 +358,13 @@ if [ -n "$zypper" ]; then
 fi
 
 if [ -n "$yum" ] && [ "$ID" != "fedora" ]; then
-    # If already installed, these packages can interfere with our Wireshark
-    sudo yum remove -y pyOpenSSL wireshark 2> /dev/null
+    if [ -n "$RHELVER" ] && [ "$RHELVER" -gt 7 ]; then
+      # new-enough RHEL won't need a compiled wireshark
+      sudo yum remove -y pyOpenSSL 2> /dev/null
+    else
+      # If already installed, these packages can interfere with our Wireshark
+      sudo yum remove -y pyOpenSSL wireshark 2> /dev/null
+    fi
 fi
 
 if [ -n "$apt" ]; then
@@ -826,8 +858,12 @@ if [ -f ~/.xinitrc ]; then
 fi
 echo "sudo service dnsmasq restart" > ~/.xinitrc
 echo "sudo service dhcpd restart" >> ~/.xinitrc
-echo 'DBUS_SESSION_BUS_ADDRESS=unix:path=$XDG_RUNTIME_DIR/bus exec /usr/bin/xfce4-session' >> ~/.xinitrc
-
+if [ -n "$RHELVER" ] && [ "$RHELVER" -eq 7 ]; then
+  echo 'eval $(dbus-launch --auto-syntax)' >> ~/.xinitrc
+  echo 'startxfce4' >> ~/.xinitrc
+else
+  echo 'DBUS_SESSION_BUS_ADDRESS=unix:path=$XDG_RUNTIME_DIR/bus exec /usr/bin/xfce4-session' >> ~/.xinitrc
+fi
 startx=$(grep startx ~/.bash_profile)
 if [ -z "$startx" ]; then
     echo startx >> ~/.bash_profile

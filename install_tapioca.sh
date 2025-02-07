@@ -91,22 +91,23 @@ exec > >(tee -i install.log)
 # adding his answer to mine.
 exec 2>&1
 
-if [ -z "$tapiocasudo" ]; then
-    echo "$user_id isn't part of the \"$sudogroup\" group."
-    echo "Please run the following command as root and re-run $0:"
-    echo "usermod -aG $sudogroup tapioca"
-    echo ""
-    echo "Logging out and back in again may be required after making this change."
-    echo "If you continue to have sudo trouble, ensure that $sudogroup is enabled"
-    echo "in the /etc/sudoers file"
-    exit 1
-fi
-
 sudo ls > /dev/null
 if [ $? -ne 0 ]; then
-    echo "We seem to not be able to use sudo"
-    echo "Please run visudo as root and look to see that $sudogroup can run commands"
-    exit 1
+  if [ -z "$tapiocasudo" ]; then
+      echo "$user_id isn't part of the \"$sudogroup\" group."
+      echo "Please run the following command as root and re-run $0:"
+      echo "usermod -aG $sudogroup tapioca"
+      echo ""
+      echo "Logging out and back in again may be required after making this change."
+      echo "If you continue to have sudo trouble, ensure that $sudogroup is enabled"
+      echo "in the /etc/sudoers file"
+      exit 1
+  else
+      echo "We seem to not be able to use sudo"
+      echo "Please run visudo as root and look to see that users in $sudogroup can run commands"
+      echo "If they can, you may need to reboot for changes to be made active"
+      exit 1
+  fi
 fi
 
 sudo_configured=$(sudo grep "tapioca ALL=NOPASSWD: ALL" /etc/sudoers)

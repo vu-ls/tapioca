@@ -102,6 +102,13 @@ if [ -z "$tapiocasudo" ]; then
     exit 1
 fi
 
+sudo ls > /dev/null
+if [ $? -ne 0 ]; then
+    echo "We seem to not be able to use sudo"
+    echo "Please run visudo as root and look to see that $sudogroup can run commands"
+    exit 1
+fi
+
 sudo_configured=$(sudo grep "tapioca ALL=NOPASSWD: ALL" /etc/sudoers)
 
 if [ -z "$sudo_configured" ]; then

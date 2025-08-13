@@ -339,8 +339,9 @@ elif [ -n "$apt" ]; then
       echo "Error installing dependency packages. Please check errors and try again."
       exit 1
     fi
+    DEBIAN_FRONTEND=noninteractive sudo -E apt-get -y install python3-colorama
     DEBIAN_FRONTEND=noninteractive sudo -E apt-get -y install libqt4-dev \
-    python3-pyqt4 python3-colorama
+    python3-pyqt4
     if [ $? -ne 0 ]; then
         echo "No PyQt4 available. Will configure Tapioca to use PyQt5 installed via pip..."
         pyqt5=1

@@ -177,12 +177,16 @@ fi
 
 if [ -n "$dnf" ] && [ "$ID" == "fedora" ]; then
     # dnf is present. So probably Fedora
+    echo "Detected Fedora"
     sudo dnf -y group install "Fedora Workstation"
     sudo dnf -y group install xfce "Development tools" "Development Libraries"
+    if [ $? -ne 0 ]; then
+      sudo dnf -y install @c-development @xfce-desktop-environment
+    fi
     sudo dnf -y install perl-Pod-Html gcc-c++ redhat-rpm-config python3-devel
 fi
 
-if [ -n "$yum" ]; then
+if [ -n "$yum" ] && [ "$ID" != "fedora" ]; then
     #EL and not Fedora
     if [ -n "$PLATFORM_ID" ]; then
       RHELVER=$(echo $PLATFORM_ID | awk -F'el' '{print $2}')

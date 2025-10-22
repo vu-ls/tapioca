@@ -449,22 +449,38 @@ if [ "$ID" = "raspbian" ]; then
     sudo apt-get -y install network-manager-gnome
     sudo apt-get -y purge openresolv dhcpcd5
     sudo ln -sf /lib/systemd/resolv.conf /etc/resolv.conf
+    autologin=1
 fi
 
 # Automatically log in as tapioca user with gdm3 (e.g. Ubuntu)
 if [ -f /etc/gdm3/custom.conf ]; then
     # Match found.  Replace existing AutomaticLogin line
+    echo "Configuring gdm3 for auto-login"
     sudo sed -i.bak -e 's/AutomaticLogin=.*/AutomaticLogin=tapioca/' /etc/gdm3/custom.conf
     sudo sed -i.bak -e 's/#  AutomaticLoginEnable = true/AutomaticLoginEnable = true/' /etc/gdm3/custom.conf
     sudo sed -i.bak -e 's/#  AutomaticLogin = user1/AutomaticLogin = tapioca/' /etc/gdm3/custom.conf
     sudo sed -i.bak -e 's/#WaylandEnable=false/WaylandEnable=false/' /etc/gdm3/custom.conf
+    autologin=1
 fi
 
 # Automatically log in as tapioca user with lightdm
 if [ -f /etc/lightdm/lightdm.conf ]; then
     # Match found.  Replace existing autologin-user line
+    echo "Configuring lightdm for auto-login"
     sudo sed -i.bak -e 's/autologin-user=.*/autologin-user=tapioca/' /etc/lightdm/lightdm.conf
 fi
+
+if [ -z "$autologin" ]; then
+  echo "Configuring tty1 for auto-login"
+  sudo mkdir -p /etc/systemd/system/getty@tty1.service.d
+  sudo tee /etc/systemd/system/getty@tty1.service.d/override.conf >/dev/null <<'EOF'
+[Service]
+ExecStart=
+ExecStart=-/sbin/agetty --autologin tapioca --noclear %I $TERM
+EOF
+fi
+
+
 while [ -z "$mitmproxy_ok" ]; do
   # Not really a while loop.  Just a "goto" equivalent in case mitmproxy install
   # fails with miniconda

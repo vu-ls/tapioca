@@ -32,8 +32,8 @@ yum=$(which yum 2>/dev/null)
 dnf=$(which dnf 2>/dev/null)
 apt=$(which apt-get 2>/dev/null)
 zypper=$(which zypper 2>/dev/null)
-sudogroup=$(egrep "^wheel:|^sudo:" /etc/group | awk -F: '{print $1}')
-tapiocasudo=$(egrep "^$sudogroup" /etc/group | grep tapioca)
+sudogroup=$(grep -E "^wheel:|^sudo:" /etc/group | awk -F: '{print $1}')
+tapiocasudo=$(grep -E "^$sudogroup" /etc/group | grep tapioca)
 arch=$(uname -m)
 tshark="/usr/bin/tshark"
 
@@ -124,11 +124,11 @@ netstat=$(which netstat 2>/dev/null)
 
 # Detect internal and external network adapters
 if [ -z "$netstat" ]; then
-    detected_external=$(ip route show | egrep "^default " | awk -F' dev ' '{print $2}' | awk '{print $1}' | head -n1)
-    detected_internal=$(ip route show | egrep "^10.0.0.0/24 " | awk -F' dev ' '{print $2}' | awk '{print $1}' | head -n1)
+    detected_external=$(ip route show | grep -E "^default " | awk -F' dev ' '{print $2}' | awk '{print $1}' | head -n1)
+    detected_internal=$(ip route show | grep -E "^10.0.0.0/24 " | awk -F' dev ' '{print $2}' | awk '{print $1}' | head -n1)
 else
-    detected_external=$(netstat -rn | egrep "^0.0.0.0" | awk '{print $NF}' | head -n1)
-    detected_internal=$(netstat -rn | egrep "^10.0.0.0" | awk '{print $NF}' | head -n1)
+    detected_external=$(netstat -rn | grep -E "^0.0.0.0" | awk '{print $NF}' | head -n1)
+    detected_internal=$(netstat -rn | grep -E "^10.0.0.0" | awk '{print $NF}' | head -n1)
 fi
 
 
@@ -165,7 +165,7 @@ mkdir -p ~/.cache
 if [ ! -f ~/.bash_profile ]; then
     echo "PATH=$PATH" > ~/.bash_profile
 fi
-path_set=$(egrep "^PATH=" ~/.bash_profile)
+path_set=$(grep -E "^PATH=" ~/.bash_profile)
 
 if [ -z "$path_set" ]; then
     # there is a ~/.bash_profile file, but no PATH is set
@@ -408,13 +408,13 @@ fi
 # Make xfce the default for tapioca user
 if sudo [ -f /var/lib/AccountsService/users/tapioca ]; then
     # There may be a default session
-    sudo egrep "^Session=" /var/lib/AccountsService/users/tapioca > /dev/null
+    sudo grep -E "^Session=" /var/lib/AccountsService/users/tapioca > /dev/null
     if [ $? -eq 0 ]; then
         # Match found.  Replace existing Session line
         sudo sed -i.bak -e 's/Session=.*/Session=xfce/' /var/lib/AccountsService/users/tapioca
         sessionset=1
     fi   
-    sudo egrep "^XSession=" /var/lib/AccountsService/users/tapioca > /dev/null
+    sudo grep -E "^XSession=" /var/lib/AccountsService/users/tapioca > /dev/null
     if [ $? -eq 0 ]; then
         # Match found.  Replace existing XSession line
         sudo sed -i.bak -e 's/XSession=.*/XSession=xfce/' /var/lib/AccountsService/users/tapioca
@@ -545,7 +545,7 @@ while [ -z "$mitmproxy_ok" ]; do
       # miniconda python install
       # Check if the PATH var is already set in .bash_profile
       touch ~/.bash_profile
-      path_set=$(egrep "^PATH=" ~/.bash_profile | grep $HOME/miniconda/bin)
+      path_set=$(grep -E "^PATH=" ~/.bash_profile | grep $HOME/miniconda/bin)
 
 
       if [ -z "$path_set" ]; then
@@ -855,9 +855,9 @@ fi
 cp -r local/share ~/.local/
 
 if [ -n "$new_wireshark_icons" ]; then
-    find ~/.config/xfce4/panel/ -name "*.desktop" | xargs egrep -l "^Icon=application-wireshark-doc" | xargs -n1 sed -i.bak -e "s/^Icon=application-wireshark-doc/Icon=org.wireshark.Wireshark-mimetype/"
-    find ~/.config/xfce4/panel/ -name "*.desktop" | xargs egrep -l "^Icon=wireshark" | xargs -n1 sed -i.bak -e "s/^Icon=wireshark/Icon=org.wireshark.Wireshark/"
-    find ~/.local/share/applications/ -name "*.desktop" | xargs egrep -l "^Icon=wireshark" | xargs -n1 sed -i.bak -e "s/^Icon=wireshark/Icon=org.wireshark.Wireshark/"
+    find ~/.config/xfce4/panel/ -name "*.desktop" | xargs grep -E -l "^Icon=application-wireshark-doc" | xargs -n1 sed -i.bak -e "s/^Icon=application-wireshark-doc/Icon=org.wireshark.Wireshark-mimetype/"
+    find ~/.config/xfce4/panel/ -name "*.desktop" | xargs grep -E -l "^Icon=wireshark" | xargs -n1 sed -i.bak -e "s/^Icon=wireshark/Icon=org.wireshark.Wireshark/"
+    find ~/.local/share/applications/ -name "*.desktop" | xargs grep -E -l "^Icon=wireshark" | xargs -n1 sed -i.bak -e "s/^Icon=wireshark/Icon=org.wireshark.Wireshark/"
 fi
 
 pushd ~/.local/share/mime
@@ -929,7 +929,7 @@ fi
 if [ -e "/etc/systemd/resolved.conf" ]; then
     # Ubuntu 18.04 uses systemd-resolve instead of dnsmasq.
     # We need to enable udp-listening resolver.
-    udplistener=$(egrep "^DNSStubListener=udp" /etc/systemd/resolved.conf)
+    udplistener=$(grep -E "^DNSStubListener=udp" /etc/systemd/resolved.conf)
     if [ -z "$udplistener" ]; then
         sudo bash -c "echo 'DNSStubListener=udp' >> /etc/systemd/resolved.conf"
     fi
@@ -944,12 +944,12 @@ fi
 
 # Some distros (e.g. Fedora) may configure dnsmasq to only listen on loopback
 if [ -f /etc/dnsmasq.conf ]; then
-  loopback_dnsmasq=$(egrep "^interface=lo" /etc/dnsmasq.conf)
+  loopback_dnsmasq=$(grep -E "^interface=lo" /etc/dnsmasq.conf)
   if [ -n "$loopback_dnsmasq" ]; then
     echo Unsetting dnsmasq directive to only bind to loopback...
     sudo sed -i.bak -e "s/^interface=lo/#interface=lo/" /etc/dnsmasq.conf
   fi
-  bind_interfaces=$(egrep "^bind-interfaces" /etc/dnsmasq.conf)
+  bind_interfaces=$(grep -E "^bind-interfaces" /etc/dnsmasq.conf)
   if [ -n "$bind_interfaces" ]; then
     echo Unsetting dnsmasq bind-interfaces directive...
     sudo sed -i.bak -e "s/^bind-interfaces/#bind-interfaces/" /etc/dnsmasq.conf

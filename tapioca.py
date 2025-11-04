@@ -919,9 +919,16 @@ class Window(QWidget):
 
     @QtCore.pyqtSlot(str)
     def getapp(self, appname):
-        text, ok = QInputDialog.getText(
-            self, 'Tapioca', 'Enter capture session name:', QLineEdit.Normal,
-            appname)
+        try:
+            echo_mode = QLineEdit.EchoMode.Normal
+        except AttributeError:
+            echo_mode = QLineEdit.Normal
+
+        try:
+            mode = QLineEdit.EchoMode.Normal
+        except AttributeError:
+            mode = QLineEdit.Normal
+        text, ok = QInputDialog.getText(self, 'Tapioca', 'Enter capture session name:', mode, appname)
         appname = re.sub(r'\W+', '', str(text)).lower()
 
         if ok:

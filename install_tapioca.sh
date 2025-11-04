@@ -581,6 +581,11 @@ while [ -z "$mitmproxy_ok" ]; do
           sed -i.bak -e "s@^PATH=@PATH=/sbin:/usr/sbin:@" ~/.bash_profile
       fi
 
+      if [ -f ~/.profile ] && [ ! -s ~/.profile ]; then
+          # Ok, Ubuntu 25.10...
+          cp /etc/skel/.profile ~/.profile
+      fi
+        
 
       # Check if the PATH var is already set in .profile
       profile_exists=$(grep PATH= ~/.profile)

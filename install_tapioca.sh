@@ -711,6 +711,9 @@ while [ -z "$mitmproxy_ok" ]; do
 
   # Install mitmproxy pyshark and deps into miniconda installation
   if [ -n "$miniconda_python" ]; then
+      # Accept the miniconda license
+      conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main
+      conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r
       # We have miniconda, so leverage that for what we can
       conda install -y sortedcontainers passlib certifi pyparsing click ruamel_yaml colorama pyopenssl
       $mypip install pyshark GitPython

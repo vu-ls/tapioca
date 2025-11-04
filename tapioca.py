@@ -53,9 +53,14 @@ except ImportError:
         from PyQt5.QtGui import QCursor, QIcon
         from PyQt5.QtNetwork import QLocalSocket, QLocalServer, QAbstractSocket
     except ImportError:
-        print(
-              'Be sure to run ./install_tapioca.sh before attempting to run %s' % __file__)
-        sys.exit(1)
+        try:
+            from PyQt6 import QtCore
+            from PyQt6.QtWidgets import QLabel, QLineEdit, QPushButton, QWidget, QApplication, QComboBox, QCheckBox, QFormLayout, QInputDialog, QMessageBox
+            from PyQt6.QtGui import QCursor, QIcon
+            from PyQt6.QtNetwork import QLocalSocket, QLocalServer, QAbstractSocket
+        except ImportError:
+            print('Be sure to run ./install_tapioca.sh before attempting to run %s' % __file__)
+            sys.exit(1)
 
 import subprocess
 import re
@@ -897,10 +902,18 @@ class Window(QWidget):
     @QtCore.pyqtSlot()
     def center(self):
         frameGm = self.frameGeometry()
-        screen = QApplication.desktop().screenNumber(
-            QApplication.desktop().cursor().pos())
-        centerPoint = QApplication.desktop().screenGeometry(
-            screen).center()
+        try:
+            screen = QApplication.desktop().screenNumber(
+                QApplication.desktop().cursor().pos())
+            centerPoint = QApplication.desktop().screenGeometry(
+                screen).center()
+        except AttributeError:
+            #Qt6
+            screens = QApplication.screens()
+            cursor_pos = QCursor.pos()
+            screen = next((s for s in screens if s.geometry().contains(cursor_pos)),
+                  QApplication.primaryScreen())
+            centerPoint = screen.geometry().center()
         frameGm.moveCenter(centerPoint)
         self.move(frameGm.topLeft())
 
@@ -1074,6 +1087,9 @@ if __name__ == '__main__':
                 print('Socket trouble!')
 
     try:
-        sys.exit(app.exec_())
+        if hasattr(app, "exec"):
+            sys.exit(app.exec())
+        else:
+            sys.exit(app.exec_())
     except:
         pass

@@ -29,8 +29,17 @@ try:
     from PyQt4.QtGui import QApplication, QWidget, QPushButton, QMessageBox, QInputDialog
     from PyQt4.QtCore import pyqtSlot
 except ImportError:
-    from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QMessageBox, QInputDialog
-    from PyQt5.QtCore import pyqtSlot
+    try:
+        from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QMessageBox, QInputDialog
+        from PyQt5.QtCore import pyqtSlot
+    except ImportError:
+        try:
+            from PyQt6.QtWidgets import QApplication, QWidget, QPushButton, QMessageBox, QInputDialog
+            from PyQt6.QtWidgets import QApplication, QWidget, QPushButton, QMessageBox, QInputDialog
+        except ImportError:
+            print('Be sure to run ./install_tapioca.sh before attempting to run %s' % __file__)
+            sys.exit(1)
+
 
 
 app = QApplication([])

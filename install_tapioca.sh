@@ -716,7 +716,7 @@ while [ -z "$mitmproxy_ok" ]; do
       conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r
       # We have miniconda, so leverage that for what we can
       conda install -y sortedcontainers passlib certifi pyparsing click ruamel_yaml colorama pyopenssl
-      $mypip install pyshark GitPython
+      $mypip install pyshark GitPython colorama
       $mypip install mitmproxy
       if [ $? -ne 0 ]; then
         echo Trouble installing mitmproxy with $mypip. Retrying python install...

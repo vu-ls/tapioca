@@ -216,7 +216,7 @@ if [ -n "$yum" ] && [ "$ID" != "fedora" ]; then
       # Centos 8 has moved some stuff around
       sudo yum -y groupinstall "Development tools" "Server with GUI" xfce
       if [ $? -ne 0 ]; then
-        echo "This platform (RHEL / CentOS version $RHELVER) does not have the packages required to install tapioca.
+        echo "This platform (RHEL / CentOS version $RHELVER) does not have the packages required to install tapioca."
         exit 1
       fi
       if [ -f /etc/yum.repos.d/CentOS-PowerTools.repo ]; then

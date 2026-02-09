@@ -184,8 +184,12 @@ class Example(QtCore.QObject):
             self.gui.lbltcpdump.setText('COMPLETE')
             self.gui.lbltcpdump.setToolTip(
                 'Open tcpdump capture for %s' % self.appname)
-            self.gui.lbltcpdump.setCursor(
-                QCursor(QtCore.Qt.PointingHandCursor))
+            try:
+                self.gui.lbltcpdump.setCursor(
+                    QCursor(QtCore.Qt.PointingHandCursor))
+            except AttributeError:
+                self.gui.lbltcpdump.setCursor(
+                    QCursor(QtCore.Qt.CursorShape.PointingHandCursor))                
         else:
             self.gui.lbltcpdump.setText('')
             self.gui.lbltcpdump.setToolTip('')
@@ -194,8 +198,12 @@ class Example(QtCore.QObject):
             self.gui.lblssltest.setText('COMPLETE')
             self.gui.lblssltest.setToolTip(
                 'Open mitmproxy SSL test capture for %s' % self.appname)
-            self.gui.lblssltest.setCursor(
-                QCursor(QtCore.Qt.PointingHandCursor))
+            try:
+                self.gui.lblssltest.setCursor(
+                    QCursor(QtCore.Qt.PointingHandCursor))
+            except AttributeError:
+                self.gui.lblssltest.setCursor(
+                    QCursor(QtCore.Qt.CursorShape.PointingHandCursor))           
         else:
             self.gui.lblssltest.setText('')
             self.gui.lblssltest.setToolTip('')
@@ -204,8 +212,12 @@ class Example(QtCore.QObject):
             self.gui.lblfull.setText('COMPLETE')
             self.gui.lblfull.setToolTip(
                 'Open mitmproxy full inspection capture for %s' % self.appname)
-            self.gui.lblfull.setCursor(
-                QCursor(QtCore.Qt.PointingHandCursor))
+            try:
+                self.gui.lblfull.setCursor(
+                    QCursor(QtCore.Qt.PointingHandCursor))
+            except AttributeError:
+                self.gui.lblfull.setCursor(
+                    QCursor(QtCore.Qt.CursorShape.PointingHandCursor))           
         else:
             self.gui.lblfull.setText('')
             self.gui.lblfull.setToolTip('')
@@ -818,8 +830,12 @@ class Window(QWidget):
             if self.foundunenc:
                 searchresults = 'Unencrypted traffic'
                 self.lblsearchfound.setText(searchresults)
-                self.lblsearchfound.setCursor(
-                    QCursor(QtCore.Qt.PointingHandCursor))
+                try:
+                    self.lblsearchfound.setCursor(
+                        QCursor(QtCore.Qt.PointingHandCursor))
+                except AttributeError:
+                    self.lblsearchfound.setCursor(
+                        QCursor(QtCore.Qt.CursorShape.PointingHandCursor))                    
                 self.lblsearchfound.setToolTip('Open raw tcpdump capture')
             else:
                 self.lblsearchfound.setText('')
@@ -831,8 +847,12 @@ class Window(QWidget):
                     searchresults = searchresults + ', '
                 searchresults = 'Unprotected HTTPS traffic'
                 self.lblsearchunprotfound.setText(searchresults)
-                self.lblsearchunprotfound.setCursor(
-                    QCursor(QtCore.Qt.PointingHandCursor))
+                try:
+                    self.lblsearchunprotfound.setCursor(
+                        QCursor(QtCore.Qt.PointingHandCursor))
+                except AttributeError:
+                    self.lblsearchunprotfound.setCursor(
+                        QCursor(QtCore.Qt.CursorShape.PointingHandCursor))                    
                 self.lblsearchunprotfound.setToolTip(
                     'Open SSL test mitmproxy capture')
             else:
@@ -845,8 +865,12 @@ class Window(QWidget):
                     searchresults = searchresults + ', '
                 searchresults = 'Protected HTTPS traffic'
                 self.lblsearchprotfound.setText(searchresults)
-                self.lblsearchprotfound.setCursor(
-                    QCursor(QtCore.Qt.PointingHandCursor))
+                try:
+                    self.lblsearchprotfound.setCursor(
+                        QCursor(QtCore.Qt.PointingHandCursor))
+                except AttributeError:
+                    self.lblsearchprotfound.setCursor(
+                        QCursor(QtCore.Qt.CursorShape.PointingHandCursor))                    
                 self.lblsearchprotfound.setToolTip(
                     'Open full HTTPS inspection mitmproxy capture')
             else:
@@ -982,8 +1006,12 @@ class Window(QWidget):
                     if test == 'ssltest':
                         self.lblsslresultsval.setToolTip(
                             'Open SSL test report')
-                        self.lblsslresultsval.setCursor(
-                            QCursor(QtCore.Qt.PointingHandCursor))
+                        try:
+                            self.lblsslresultsval.setCursor(
+                                QCursor(QtCore.Qt.PointingHandCursor))
+                        except AttributeError:
+                            self.lblsslresultsval.setCursor(
+                                QCursor(QtCore.Qt.CursorShape.PointingHandCursor))
                         if failures[test] is True:
                             #print('failed ssl!')
                             self.lblsslresultsval.setText(
@@ -995,8 +1023,12 @@ class Window(QWidget):
                     elif test == 'crypto':
                         self.lblcryptoresultsval.setToolTip(
                             'Open SSL test report')
-                        self.lblcryptoresultsval.setCursor(
-                            QCursor(QtCore.Qt.PointingHandCursor))
+                        try:
+                            self.lblcryptoresultsval.setCursor(
+                                QCursor(QtCore.Qt.PointingHandCursor))
+                        except AttributeError:
+                            self.lblcryptoresultsval.setCursor(
+                                QCursor(QtCore.Qt.CursorShape.PointingHandCursor))                            
                         if failures[test] is True:
                             self.lblcryptoresultsval.setText(
                                 '<font color="red">FAILED</font>')
@@ -1006,8 +1038,12 @@ class Window(QWidget):
                     elif test == 'net':
                         self.lblnetresultsval.setToolTip(
                             'Open SSL test report')
-                        self.lblnetresultsval.setCursor(
-                            QCursor(QtCore.Qt.PointingHandCursor))
+                        try:
+                            self.lblnetresultsval.setCursor(
+                                QCursor(QtCore.Qt.PointingHandCursor))
+                        except AttributeError:
+                            self.lblnetresultsval.setCursor(
+                                QCursor(QtCore.Qt.CursorShape.PointingHandCursor))                            
                         if test in failures:
                             self.lblnetresultsval.setText('VIEW')
                         else:
@@ -1041,8 +1077,12 @@ class Window(QWidget):
                     if status == 'COMPLETE':
                         self.lbltcpdump.setToolTip(
                             'Open tcpdump capture for %s' % self.appname)
-                        self.lbltcpdump.setCursor(
-                            QCursor(QtCore.Qt.PointingHandCursor))
+                        try:
+                            self.lbltcpdump.setCursor(
+                                QCursor(QtCore.Qt.PointingHandCursor))
+                        except AttributeError:
+                            self.lbltcpdump.setCursor(
+                                QCursor(QtCore.Qt.CursorShape.PointingHandCursor))                            
                     else:
                         self.lbltcpdump.setToolTip('')
                         self.lbltcpdump.setCursor(QCursor())
@@ -1051,8 +1091,12 @@ class Window(QWidget):
                     if status == 'COMPLETE':
                         self.lblssltest.setToolTip(
                             'Open mitmproxy SSL test capture for %s' % self.appname)
-                        self.lblssltest.setCursor(
-                            QCursor(QtCore.Qt.PointingHandCursor))
+                        try:
+                            self.lblssltest.setCursor(
+                                QCursor(QtCore.Qt.PointingHandCursor))
+                        except AttributeError:
+                            self.lblssltest.setCursor(
+                                QCursor(QtCore.Qt.CursorShape.PointingHandCursor))
                     else:
                         self.lblssltest.setToolTip('')
                         self.lblssltest.setCursor(QCursor())
@@ -1061,8 +1105,12 @@ class Window(QWidget):
                     if status == 'COMPLETE':
                         self.lblfull.setToolTip(
                             'Open mitmproxy full inspection capture for %s' % self.appname)
-                        self.lblfull.setCursor(
-                            QCursor(QtCore.Qt.PointingHandCursor))
+                        try:
+                            self.lblfull.setCursor(
+                                QCursor(QtCore.Qt.PointingHandCursor))
+                        except AttributeError:
+                            self.lblfull.setCursor(
+                                QCursor(QtCore.Qt.CursorShape.PointingHandCursor))
                     else:
                         self.lblfull.setToolTip('')
                         self.lblfull.setCursor(QCursor())
@@ -1086,7 +1134,12 @@ if __name__ == '__main__':
     server.newConnection.connect(example.restore)
     ok = server.listen('Tapioca')
     if not ok:
-        if server.serverError() == QAbstractSocket.AddressInUseError:
+        try:
+            socketinuse = server.serverError() == QAbstractSocket.AddressInUseError
+        except AttributeError:
+            socketinuse = server.serverError() == QAbstractSocket.SocketError.AddressInUseError
+
+        if socketinuse:
              #print('Socket in use!')
             server.removeServer('Tapioca')
             ok = server.listen('Tapioca')

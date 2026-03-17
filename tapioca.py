@@ -287,12 +287,23 @@ class Example(QtCore.QObject):
             # We need a prompt
             prompt_msg = test
             #print('We need a prompt!')
-            reply = QMessageBox.question(self.gui, 'Tapioca',
-                                               prompt_msg, QMessageBox.Yes, QMessageBox.No)
-            if reply == QMessageBox.Yes:
-                pass
-            else:
-                pass
+            try:
+                reply = QMessageBox.question(self.gui, 'Tapioca',
+                                                prompt_msg, QMessageBox.Yes, QMessageBox.No)
+            except AttributeError:
+                reply = QMessageBox.question(self.gui, 'Tapioca',
+                                                prompt_msg, QMessageBox.StandardButton.Yes, QMessageBox.StandardButton.No)
+            try:
+                if reply == QMessageBox.Yes:
+                    pass
+                else:
+                    pass
+            except AttributeError:
+                if reply == QMessageBox.StandardButton.Yes:
+                    pass
+                else:
+                    pass
+                
 
     @QtCore.pyqtSlot()
     def captcpdump(self):
@@ -306,12 +317,22 @@ class Example(QtCore.QObject):
             prompt_msg = '%s has already has output for the %s test. Continue?' % (
                 self.appname, test)
             #print('We need a prompt!')
-            reply = QMessageBox.question(self.gui, 'Tapioca',
-                                               prompt_msg, QMessageBox.Yes, QMessageBox.No)
-            if reply == QMessageBox.Yes:
-                self.clearteststatus(test)
-                self.disabletests()
-                self.workersignal.emit(test)
+            try:
+                reply = QMessageBox.question(self.gui, 'Tapioca',
+                                                prompt_msg, QMessageBox.Yes, QMessageBox.No)
+            except AttributeError:
+                reply = QMessageBox.question(self.gui, 'Tapioca',
+                                                prompt_msg, QMessageBox.StandardButton.Yes, QMessageBox.StandardButton.No)                
+            try:
+                if reply == QMessageBox.Yes:
+                    self.clearteststatus(test)
+                    self.disabletests()
+                    self.workersignal.emit(test)
+            except AttributeError:
+                if reply == QMessageBox.StandardButton.Yes:
+                    self.clearteststatus(test)
+                    self.disabletests()
+                    self.workersignal.emit(test)                
 
     @QtCore.pyqtSlot()
     def capssltest(self):
@@ -327,12 +348,23 @@ class Example(QtCore.QObject):
             prompt_msg = '%s has already has output for the %s test. Continue?' % (
                 self.appname, test)
             #print('We need a prompt!')
-            reply = QMessageBox.question(self.gui, 'Tapioca',
-                                               prompt_msg, QMessageBox.Yes, QMessageBox.No)
-            if reply == QMessageBox.Yes:
-                self.clearteststatus(test)
-                self.disabletests()
-                self.workersignal.emit(test)
+            try:
+                reply = QMessageBox.question(self.gui, 'Tapioca',
+                                                prompt_msg, QMessageBox.Yes, QMessageBox.No)
+            except AttributeError:
+                reply = QMessageBox.question(self.gui, 'Tapioca',
+                                                prompt_msg, QMessageBox.StandartButton.Yes, QMessageBox.StandardButton.No) 
+            try:               
+                if reply == QMessageBox.Yes:
+                    self.clearteststatus(test)
+                    self.disabletests()
+                    self.workersignal.emit(test)
+            except AttributeError:
+                if reply == QMessageBox.StandardButton.Yes:
+                    self.clearteststatus(test)
+                    self.disabletests()
+                    self.workersignal.emit(test)
+
 
     def _prompt_certinstall(self):
         if os.path.isfile('.certinstall'):
@@ -364,12 +396,23 @@ class Example(QtCore.QObject):
             prompt_msg = '%s has already has output for the %s test. Continue?' % (
                 self.appname, test)
             #print('We need a prompt!')
-            reply = QMessageBox.question(self.gui, 'Tapioca',
-                                               prompt_msg, QMessageBox.Yes, QMessageBox.No)
-            if reply == QMessageBox.Yes:
-                self.clearteststatus(test)
-                self.disabletests()
-                self.workersignal.emit(test)
+            try:
+                reply = QMessageBox.question(self.gui, 'Tapioca',
+                                                prompt_msg, QMessageBox.Yes, QMessageBox.No)
+            except AttributeError:
+                reply = QMessageBox.question(self.gui, 'Tapioca',
+                                                prompt_msg, QMessageBox.StandardButton.Yes, QMessageBox.StandardButton.No)
+
+            try:
+                if reply == QMessageBox.Yes:
+                    self.clearteststatus(test)
+                    self.disabletests()
+                    self.workersignal.emit(test)
+            except AttributeError:
+                if reply == QMessageBox.StandardButton.Yes:
+                    self.clearteststatus(test)
+                    self.disabletests()
+                    self.workersignal.emit(test)                
 
     @QtCore.pyqtSlot(str)
     def testdone(self, test):
@@ -401,11 +444,19 @@ class Example(QtCore.QObject):
 
     @QtCore.pyqtSlot()
     def restore(self):
-        self.gui.setWindowFlags(
-            self.gui.windowFlags() | QtCore.Qt.WindowStaysOnTopHint)
+        try:
+            self.gui.setWindowFlags(
+                self.gui.windowFlags() | QtCore.Qt.WindowStaysOnTopHint)
+        except AttributeError:
+            self.gui.setWindowFlags(
+                self.gui.windowFlags() | QtCore.Qt.WindowType.WindowStaysOnTopHint)            
         self.gui.showNormal()
-        self.gui.setWindowFlags(
-            self.gui.windowFlags() & ~QtCore.Qt.WindowStaysOnTopHint)
+        try:
+            self.gui.setWindowFlags(
+                self.gui.windowFlags() & ~QtCore.Qt.WindowStaysOnTopHint)
+        except AttributeError:
+            self.gui.setWindowFlags(
+                self.gui.windowFlags() & ~QtCore.Qt.WindowType.WindowStaysOnTopHint)            
         self.gui.showNormal()
         self.gui.activateWindow()
 

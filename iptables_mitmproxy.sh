@@ -122,9 +122,14 @@ iptables -A OUTPUT -o lo -j ACCEPT
 iptables -t nat -F PREROUTING
 iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-ports 8080
 iptables -t nat -A PREROUTING -p tcp --dport 443 -j REDIRECT --to-ports 8080
-# QUIC uses udp, so we redirect these too.  Even if mitmproxy doesn't support it.
-iptables -t nat -A PREROUTING -p udp --dport 80 -j REDIRECT --to-ports 8080
-iptables -t nat -A PREROUTING -p udp --dport 443 -j REDIRECT --to-ports 8080
+
+# Block QUIC / HTTP3 so clients fall back to TCP/TLS
+sudo iptables -A FORWARD -i "$internal_net" -o "$external_net" \
+    -p udp --dport 443 -j REJECT
+
+sudo iptables -A FORWARD -i "$internal_net" -o "$external_net" \
+    -p udp --dport 80 -j REJECT
+
 iptables -t nat -A PREROUTING -p tcp --dport 587 -j REDIRECT --to-ports 8080
 iptables -t nat -A PREROUTING -p tcp --dport 465 -j REDIRECT --to-ports 8080
 iptables -t nat -A PREROUTING -p tcp --dport 993 -j REDIRECT --to-ports 8080

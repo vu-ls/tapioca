@@ -47,10 +47,21 @@ win = QWidget()
 msgBox = QMessageBox()
 
 def YesNo(question='', caption='Tapioca'):
-    msgBox.setIcon(QMessageBox.Question)
+    try:
+        # Qt6
+        question_icon = QMessageBox.Icon.Question
+        yes_button = QMessageBox.StandardButton.Yes
+        no_button = QMessageBox.StandardButton.No
+    except AttributeError:
+        # Qt5 / Qt4
+        question_icon = QMessageBox.Question
+        yes_button = QMessageBox.Yes
+        no_button = QMessageBox.No
+
+    msgBox.setIcon(question_icon)
     msgBox.setText(question)
     msgBox.setWindowTitle(caption)
-    msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+    msgBox.setStandardButtons(yes_button | no_button)
     ret = msgBox.exec()
     if ret == QMessageBox.Yes:
         return True
@@ -59,18 +70,36 @@ def YesNo(question='', caption='Tapioca'):
 
 
 def Info(message='', caption='Tapioca'):
-    msgBox.setIcon(QMessageBox.Information)
+    try:
+        # Qt6
+        info_icon = QMessageBox.Icon.Information
+        ok_button = QMessageBox.StandardButton.Ok
+    except AttributeError:
+        # Older Qt
+        info_icon = QMessageBox.Information
+        ok_button = QMessageBox.Ok
+
+    msgBox.setIcon(info_icon)
     msgBox.setText(message)
     msgBox.setWindowTitle(caption)
-    msgBox.setStandardButtons(QMessageBox.Ok)
+    msgBox.setStandardButtons(ok_button)
     msgBox.exec()
 
 
 def Warn(message='', caption='Warning!'):
-    msgBox.setIcon(QMessageBox.Warning)
+    try:
+        # Qt6
+        warning_icon = QMessageBox.Icon.Warning
+        ok_button = QMessageBox.StandardButton.Ok
+    except AttributeError:
+        # Older Qt
+        info_icon = QMessageBox.Warning
+        ok_button = QMessageBox.Ok
+
+    msgBox.setIcon(warning_icon)
     msgBox.setText(message)
     msgBox.setWindowTitle(caption)
-    msgBox.setStandardButtons(QMessageBox.Ok)
+    msgBox.setStandardButtons(ok_button)
     msgBox.exec()
 
 

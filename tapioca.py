@@ -353,7 +353,7 @@ class Example(QtCore.QObject):
                                                 prompt_msg, QMessageBox.Yes, QMessageBox.No)
             except AttributeError:
                 reply = QMessageBox.question(self.gui, 'Tapioca',
-                                                prompt_msg, QMessageBox.StandartButton.Yes, QMessageBox.StandardButton.No) 
+                                                prompt_msg, QMessageBox.StandardButton.Yes, QMessageBox.StandardButton.No) 
             try:               
                 if reply == QMessageBox.Yes:
                     self.clearteststatus(test)

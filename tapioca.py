@@ -590,7 +590,7 @@ class WorkerObject(QtCore.QObject):
         elif message == 'report':
             #print('** running %s for %s' % (message, self.appname))
             subprocess.call(
-                ['xfce4-terminal --disable-server -H -T "Tapioca" -e "./allreports.py %s"' % self.appname], shell=True)
+                ['xfce4-terminal --disable-server -H -T "Tapioca" -- bash -lc "./allreports.py %s"' % self.appname], shell=True)
             # allreports.runreports(self.appname)
         elif message == 'opensslreport':
             #print('** received message to open report: %s' % message)

@@ -473,6 +473,9 @@ if [ -f /etc/lightdm/lightdm.conf ]; then
     # Match found.  Replace existing autologin-user line
     echo "Configuring lightdm for auto-login"
     sudo sed -i.bak -e 's/autologin-user=.*/autologin-user=tapioca/' /etc/lightdm/lightdm.conf
+    sudo sed -i.bak -e 's/#autologin-user=tapioca/autologin-user=tapioca/' /etc/lightdm/lightdm.conf
+    sudo sed -i.bak -e 's/#autologin-user-timeout=0/autologin-user-timeout=0/' /etc/lightdm/lightdm.conf
+    autologin=1
 fi
 
 if [ -z "$autologin" ]; then

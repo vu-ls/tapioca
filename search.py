@@ -62,7 +62,7 @@ def isstr(s):
     try:
         str = s.decode('UTF-8', errors='strict')
         return True
-    except UnicodeError:
+    except:
         return False
 
 

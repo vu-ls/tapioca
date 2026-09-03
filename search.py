@@ -39,7 +39,7 @@ import hashlib
 import json
 import re
 from shutil import copy2
-from mitmproxy import io
+from mitmproxy import io, http
 from misc import eprint, Logger
 
 pcapfile = 'tcpdump.pcap'
@@ -122,54 +122,40 @@ def searchmitmflow(flowfile, searchterm):
     # Create a dictionary of all of the messages in the flow
     with open(flowfile, 'rb') as logfile:
         fr = io.FlowReader(logfile)
-        msgnum = 0
+        raw_flows = [msg for msg in fr.stream() if isinstance(msg, http.HTTPFlow)]
+        
+        # 2. Sort the flows by request start time to perfectly match the mitmproxy GUI default view
+        raw_flows.sort(key=lambda msg: msg.request.timestamp_start)
+        
         flowdict = {}
         messages = []
-        for msg in fr.stream():
-            messagedict = {}
+        
+        #for msg in fr.stream():
+        for msgnum, msg in enumerate(raw_flows):
+            messagedict = {'msgnum': msgnum}
+            requestdict = {
+                'uri' : msg.request.pretty_url,
+                'method' : msg.request.method,
+                'scheme' : msg.request.scheme,
+                'headers' : msg.request.headers,
+                'content' : decodecontent(msg.request.content) or msg.request.content
+            }
+            
             responsedict = {}
-            requestdict = {}
-
-            messagedict['msgnum'] = msgnum
-
-            requestdict['uri'] = msg.request.pretty_url
-            requestdict['method'] = msg.request.method
-            requestdict['scheme'] = msg.request.scheme
-            requestdict['headers'] = msg.request.headers
-            requestcontent = msg.request.content
-            decodedcontent = decodecontent(requestcontent)
-            if decodedcontent:
-                # mitmproxy found a way to decode the content
-                requestdict['content'] = decodedcontent
-            else:
-                # just take the raw bytes
-                requestdict['content'] = requestcontent
-
             try:
                 responsedict['headers'] = msg.response.headers
+                responsecontent = msg.response.content
+                decoded_resp = decodecontent(responsecontent)
+                responsedict['content'] = decoded_resp if decoded_resp else responsecontent
             except AttributeError:
                 responsedict['headers'] = ''
-            try:
-                responsecontent = msg.response.content
-            except AttributeError:
-                responsecontent = ''
-            try:
-                decodedcontent = decodecontent(responsecontent)
-                if decodedcontent:
-                    # mitmproxy found a way to decode the content
-                    responsedict['content'] = decodecontent(responsecontent)
-                else:
-                    # just take the raw bytes
-                    responsedict['content'] = responsecontent
-
-            except AttributeError:
                 responsedict['content'] = ''
-
+                
             messagedict['request'] = requestdict
             messagedict['response'] = responsedict
-            # print(messagedict)
             messages.append(messagedict)
-            msgnum = msgnum + 1
+
+                
     flowdict['messages'] = messages
 
     # Check for matches in the flow dictionary
@@ -179,26 +165,26 @@ def searchmitmflow(flowfile, searchterm):
 
             if key == 'msgnum':
                 continue
-            else:
-                for value in message[key].values():
-                    if pcre.search(str(value)):
-                        found = True
-                        print(color.bright(color.green('Found match for %s in %s message [%s] field [%s]:' %
-                                                       (searchterm, flowfile, msgnum + 1, key))))
-                        if message['request']['scheme'] == 'https':
-                            if flowfile.endswith('ssltest.log'):
-                                foundunprot = True
-                                print(
-                                    color.bright(color.red('%s found in non-validated HTTPS traffic!' % searchterm)))
-                            elif flowfile.endswith('flows.log'):
-                                foundprot = True
-                                color.bright(
-                                    '%s found in validated HTTPS traffic' % searchterm)
-                        elif message['request']['scheme'] == 'http':
-                            foundunenc = True
+            
+            for value in message[key].values():
+                if pcre.search(str(value)):
+                    found = True
+                    print(color.bright(color.green('Found match for %s in %s message [%s] field [%s]:' %
+                                                   (searchterm, flowfile, msgnum + 1, key))))
+                    if message['request']['scheme'] == 'https':
+                       if flowfile.endswith('ssltest.log'):
+                            foundunprot = True
                             print(
-                                color.bright(color.red('%s found in unencrypted HTTP traffic!' % searchterm)))
-                        print(str(value))
+                                color.bright(color.red('%s found in non-validated HTTPS traffic!' % searchterm)))
+                       elif flowfile.endswith('flows.log'):
+                            foundprot = True
+                            color.bright(
+                                '%s found in validated HTTPS traffic' % searchterm)
+                    elif message['request']['scheme'] == 'http':
+                        foundunenc = True
+                        print(
+                            color.bright(color.red('%s found in unencrypted HTTP traffic!' % searchterm)))
+                    print(str(value))
 
 
 def check_multi(app, searchterm):

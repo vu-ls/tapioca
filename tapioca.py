@@ -28,6 +28,7 @@
 # END LICENSE #
 
 import os
+import shutil
 
 # Self-compiled PyQt5 will hang if ICEauthority file exists.  No clue why.
 # Delete it before attempting anything PyQt5
@@ -44,18 +45,18 @@ if os.path.exists(iceauthority):
 import sys
 try:
     from PyQt4 import QtCore
-    from PyQt4.QtGui import QLabel, QLineEdit, QPushButton, QCursor, QWidget, QApplication, QIcon, QComboBox, QCheckBox, QFormLayout, QInputDialog, QMessageBox
+    from PyQt4.QtGui import QLabel, QLineEdit, QPushButton, QCursor, QWidget, QApplication, QIcon, QComboBox, QCheckBox, QFormLayout, QInputDialog, QMessageBox, QGridLayout
     from PyQt4.QtNetwork import QLocalSocket, QLocalServer, QAbstractSocket
 except ImportError:
     try:
         from PyQt5 import QtCore
-        from PyQt5.QtWidgets import QLabel, QLineEdit, QPushButton, QWidget, QApplication, QComboBox, QCheckBox, QFormLayout, QInputDialog, QMessageBox
+        from PyQt5.QtWidgets import QLabel, QLineEdit, QPushButton, QWidget, QApplication, QComboBox, QCheckBox, QFormLayout, QInputDialog, QMessageBox, QGridLayout
         from PyQt5.QtGui import QCursor, QIcon
         from PyQt5.QtNetwork import QLocalSocket, QLocalServer, QAbstractSocket
     except ImportError:
         try:
             from PyQt6 import QtCore
-            from PyQt6.QtWidgets import QLabel, QLineEdit, QPushButton, QWidget, QApplication, QComboBox, QCheckBox, QFormLayout, QInputDialog, QMessageBox
+            from PyQt6.QtWidgets import QLabel, QLineEdit, QPushButton, QWidget, QApplication, QComboBox, QCheckBox, QFormLayout, QInputDialog, QMessageBox, QGridLayout
             from PyQt6.QtGui import QCursor, QIcon
             from PyQt6.QtNetwork import QLocalSocket, QLocalServer, QAbstractSocket
         except ImportError:
@@ -141,6 +142,7 @@ class Example(QtCore.QObject):
         self.gui.chksearch.stateChanged.connect(self.multitoggle)
         self.gui.chkrewrite.stateChanged.connect(self.rewritetoggle)
         self.gui.btnrewrite.clicked.connect(self.editrewrite)
+        self.gui.chkcompromised.stateChanged.connect(self.compromisedtoggle)
 
         self.worker.signalStatus.connect(self.gui.updateStatus)
         self.worker.signalStatus.connect(self.updateStatus)
@@ -484,6 +486,19 @@ class Example(QtCore.QObject):
             self.worker.rewrite = False
             self.gui.btnrewrite.setEnabled(False)
 
+    @QtCore.pyqtSlot()
+    def compromisedtoggle(self):
+        if self.gui.chkcompromised.isChecked():
+            print('Compromised Checked!')
+            shutil.copyfile('.mitmproxy/mitmproxy-ca.pem.aaa', '.mitmproxy/mitmproxy-ca.pem')
+            #self.worker.compromised = True
+            #self.gui.btncompromised.setEnabled(True)
+        else:
+            print('Compromised unchecked')
+            shutil.copyfile('.mitmproxy/mitmproxy-ca.pem.orig', '.mitmproxy/mitmproxy-ca.pem')
+            #self.worker.compromised = False
+            #self.gui.btncompromised.setEnabled(False)
+
 
     @QtCore.pyqtSlot()
     def allreports(self):
@@ -809,6 +824,13 @@ class Window(QWidget):
         self.lblsearchfound = QLabel()
         self.lblsearchunprotfound = QLabel()
         self.lblsearchprotfound = QLabel()
+        self.chkcompromised = QCheckBox('Use compromised cert')
+        self.chkcompromised.setToolTip(
+            'Use compromised eMudhra intermediate certificate\nNot all platforms trust this chain.')
+
+        # Quick loop to apply the styling to all capture buttons at once
+        for button in [self.btntcpdump, self.btnssl, self.btnfull]:
+            button.setStyleSheet("text-align: left; padding-left: 10px;")
 
         #layout = QVBoxLayout(self)
         layout = QFormLayout(self)
@@ -817,9 +839,27 @@ class Window(QWidget):
         layout.addRow(self.net_status)
         #layout.addRow(self.lblapp, self.leapp)
         layout.addRow(self.lblapp, self.cboapp)
-        layout.addRow(self.btntcpdump, self.lbltcpdump)
-        layout.addRow(self.btnssl, self.lblssltest)
-        layout.addRow(self.btnfull, self.lblfull)
+
+        # 2. Create an isolated QGridLayout JUST for the aligned columns section
+        capture_grid = QGridLayout()
+
+        # Add your capture widgets to this mini-grid using row/col coordinates
+        # (Notice we start counting rows from 0 inside this specific grid)
+        capture_grid.addWidget(self.btntcpdump, 0, 0)
+        capture_grid.addWidget(self.lbltcpdump, 0, 1)
+        capture_grid.addWidget(QWidget(), 0, 2)  # Empty structural placeholder
+
+        capture_grid.addWidget(self.btnssl, 1, 0)
+        capture_grid.addWidget(self.lblssltest, 1, 1)
+        capture_grid.addWidget(QWidget(), 1, 2)  # Empty structural placeholder
+
+        capture_grid.addWidget(self.btnfull, 2, 0)
+        capture_grid.addWidget(self.lblfull, 2, 1)
+        capture_grid.addWidget(self.chkcompromised, 2, 2)
+
+        # 3. Drop the entire grid right into your main QFormLayout as a single row
+        layout.addRow(capture_grid)
+
         layout.addRow(self.chkrewrite, self.btnrewrite)
         layout.addRow(self.btnstop)
         layout.addRow(self.spacer)

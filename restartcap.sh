@@ -59,9 +59,9 @@ if [ "$testmode" == "ssltest" ]; then
     xterm -geometry -100-100 -e "tail -F $outputdir/ssltest.log | strings | grep \"5:https,\"" &
     sudo ./iptables_mitmproxy.sh
     if [ -z "$rewrite" ]; then
-        mitmproxy --showhost --anticomp --anticache --ssl-insecure --mode transparent -w $outputdir/ssltest.log
+        mitmproxy --showhost --anticomp --anticache --ssl-insecure --mode transparent -w $outputdir/ssltest.log --set validate_inbound_headers=false
     else
-        mitmproxy --showhost --anticomp --anticache --ssl-insecure --mode transparent -w $outputdir/ssltest.log -s rewrite.py
+        mitmproxy --showhost --anticomp --anticache --ssl-insecure --mode transparent -w $outputdir/ssltest.log -s rewrite.py --set validate_inbound_headers=false
     fi
     ./uris.py $outputdir/ssltest.log
 elif [ "$testmode" == "full" ]; then
@@ -69,9 +69,9 @@ elif [ "$testmode" == "full" ]; then
     rm -f logs/flows.log
     sudo ./iptables_mitmproxy.sh
     if [ -z "$rewrite" ]; then
-        SSLKEYLOGFILE=$outputdir/sslkey.log mitmproxy --showhost --anticomp --anticache --ssl-insecure --mode transparent -w $outputdir/flows.log
+        SSLKEYLOGFILE=$outputdir/sslkey.log mitmproxy --showhost --anticomp --anticache --ssl-insecure --mode transparent -w $outputdir/flows.log --set validate_inbound_headers=false
     else
-	    SSLKEYLOGFILE=$outputdir/sslkey.log mitmproxy --showhost --anticomp --anticache --ssl-insecure --mode transparent -w $outputdir/flows.log -s rewrite.py
+	    SSLKEYLOGFILE=$outputdir/sslkey.log mitmproxy --showhost --anticomp --anticache --ssl-insecure --mode transparent -w $outputdir/flows.log -s rewrite.py --set validate_inbound_headers=false
     fi
 elif [ "$testmode" == "tcpdump" ]; then
     # Just capture raw traffic without interfering

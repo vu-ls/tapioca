@@ -462,7 +462,7 @@ class Example(QtCore.QObject):
 
     @QtCore.pyqtSlot()
     def multitoggle(self):
-        if self.gui.chksearch.checkState():
+        if self.gui.chksearch.isChecked():
             # print('Checked!')
             self.worker.searchmulti = True
         else:
@@ -475,7 +475,7 @@ class Example(QtCore.QObject):
 
     @QtCore.pyqtSlot()
     def rewritetoggle(self):
-        if self.gui.chkrewrite.checkState():
+        if self.gui.chkrewrite.isChecked():
             # print('Checked!')
             self.worker.rewrite = True
             self.gui.btnrewrite.setEnabled(True)

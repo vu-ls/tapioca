@@ -50,13 +50,13 @@ try:
 except ImportError:
     try:
         from PyQt5 import QtCore
-        from PyQt5.QtWidgets import QLabel, QLineEdit, QPushButton, QWidget, QApplication, QComboBox, QCheckBox, QFormLayout, QInputDialog, QMessageBox, QGridLayout
+        from PyQt5.QtWidgets import QLabel, QLineEdit, QPushButton, QWidget, QApplication, QComboBox, QCheckBox, QFormLayout, QInputDialog, QMessageBox, QGridLayout, QSizePolicy, QHBoxLayout
         from PyQt5.QtGui import QCursor, QIcon
         from PyQt5.QtNetwork import QLocalSocket, QLocalServer, QAbstractSocket
     except ImportError:
         try:
             from PyQt6 import QtCore
-            from PyQt6.QtWidgets import QLabel, QLineEdit, QPushButton, QWidget, QApplication, QComboBox, QCheckBox, QFormLayout, QInputDialog, QMessageBox, QGridLayout
+            from PyQt6.QtWidgets import QLabel, QLineEdit, QPushButton, QWidget, QApplication, QComboBox, QCheckBox, QFormLayout, QInputDialog, QMessageBox, QGridLayout, QSizePolicy, QHBoxLayout
             from PyQt6.QtGui import QCursor, QIcon
             from PyQt6.QtNetwork import QLocalSocket, QLocalServer, QAbstractSocket
         except ImportError:
@@ -839,26 +839,43 @@ class Window(QWidget):
         layout.addRow(self.net_status)
         #layout.addRow(self.lblapp, self.leapp)
         layout.addRow(self.lblapp, self.cboapp)
-
-        # 2. Create an isolated QGridLayout JUST for the aligned columns section
-        capture_grid = QGridLayout()
-
-        # Add your capture widgets to this mini-grid using row/col coordinates
-        # (Notice we start counting rows from 0 inside this specific grid)
-        capture_grid.addWidget(self.btntcpdump, 0, 0)
-        capture_grid.addWidget(self.lbltcpdump, 0, 1)
-        capture_grid.addWidget(QWidget(), 0, 2)  # Empty structural placeholder
-
-        capture_grid.addWidget(self.btnssl, 1, 0)
-        capture_grid.addWidget(self.lblssltest, 1, 1)
-        capture_grid.addWidget(QWidget(), 1, 2)  # Empty structural placeholder
-
-        capture_grid.addWidget(self.btnfull, 2, 0)
-        capture_grid.addWidget(self.lblfull, 2, 1)
-        capture_grid.addWidget(self.chkcompromised, 2, 2)
-
-        # 3. Drop the entire grid right into your main QFormLayout as a single row
-        layout.addRow(capture_grid)
+        
+        # --- 1. TCPDUMP ROW ---
+        row_tcpdump = QHBoxLayout()
+        row_tcpdump.addWidget(self.btntcpdump)
+        row_tcpdump.addWidget(self.lbltcpdump)
+        row_tcpdump.addStretch(1) # Pushes everything to the left
+        
+        # --- 2. VERIFY ROW ---
+        row_verify = QHBoxLayout()
+        row_verify.addWidget(self.btnssl)
+        row_verify.addWidget(self.lblssltest)
+        row_verify.addStretch(1)
+        
+        # --- 3. FULL ROW ---
+        row_full = QHBoxLayout()
+        row_full.addWidget(self.btnfull)
+        row_full.addWidget(self.lblfull)
+        row_full.addWidget(self.chkcompromised)
+        row_full.addStretch(1)
+        
+        # ==============================================================================
+        # THE FIX: Force all three buttons to be exactly the same width.
+        # This aligns your "COMPLETE" labels perfectly in a straight vertical line!
+        # ==============================================================================
+        # 280 pixels is roughly wide enough to fit "Capture - Full HTTPS inspection" 
+        # without clipping. Adjust this number up or down if text still clips.
+        BUTTON_WIDTH = 280 
+        
+        for button in [self.btntcpdump, self.btnssl, self.btnfull]:
+                button.setFixedWidth(BUTTON_WIDTH)
+                button.setStyleSheet("text-align: left; padding-left: 10px;")
+                    
+        # --- 4. Add them back to your main form layout normally ---
+        layout.addRow(self.lblapp, self.cboapp)
+        layout.addRow(row_tcpdump)
+        layout.addRow(row_verify)
+        layout.addRow(row_full)
 
         layout.addRow(self.chkrewrite, self.btnrewrite)
         layout.addRow(self.btnstop)

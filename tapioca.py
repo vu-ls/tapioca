@@ -45,7 +45,7 @@ if os.path.exists(iceauthority):
 import sys
 try:
     from PyQt4 import QtCore
-    from PyQt4.QtGui import QLabel, QLineEdit, QPushButton, QCursor, QWidget, QApplication, QIcon, QComboBox, QCheckBox, QFormLayout, QInputDialog, QMessageBox, QGridLayout
+    from PyQt4.QtGui import QLabel, QLineEdit, QPushButton, QCursor, QWidget, QApplication, QIcon, QComboBox, QCheckBox, QFormLayout, QInputDialog, QMessageBox, QGridLayout, QSizePolicy, QHBoxLayout
     from PyQt4.QtNetwork import QLocalSocket, QLocalServer, QAbstractSocket
 except ImportError:
     try:

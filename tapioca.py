@@ -865,7 +865,7 @@ class Window(QWidget):
         # ==============================================================================
         # 280 pixels is roughly wide enough to fit "Capture - Full HTTPS inspection" 
         # without clipping. Adjust this number up or down if text still clips.
-        BUTTON_WIDTH = 280 
+        BUTTON_WIDTH = 220 
         
         for button in [self.btntcpdump, self.btnssl, self.btnfull]:
                 button.setFixedWidth(BUTTON_WIDTH)

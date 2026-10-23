@@ -133,12 +133,13 @@ def searchmitmflow(flowfile, searchterm):
         #for msg in fr.stream():
         for msgnum, msg in enumerate(raw_flows):
             messagedict = {'msgnum': msgnum}
+            content = msg.request.get_content(strict=False)
             requestdict = {
                 'uri' : msg.request.pretty_url,
                 'method' : msg.request.method,
                 'scheme' : msg.request.scheme,
                 'headers' : msg.request.headers,
-                'content' : decodecontent(msg.request.content) or msg.request.content
+                'content': decodecontent(content) or content
             }
             
             responsedict = {}

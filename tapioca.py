@@ -151,7 +151,6 @@ class Example(QtCore.QObject):
         # self.gui.leapp.editingFinished.connect(self.updateapp)
         self.gui.cboapp.editTextChanged.connect(self.updateapp)
         self.gui.searchbox.editingFinished.connect(self.updatesearch)
-        self.gui.certselect.currentTextChanged.connect(self.certselect)
 
         self.gui.lblsearchfound.mousePressEvent = self.opentcpdump
         self.gui.lblsearchunprotfound.mousePressEvent = self.openssltest
@@ -245,14 +244,6 @@ class Example(QtCore.QObject):
         self.searchterm = self.gui.searchbox.text()
         #print('updating self.searchterm to %s' % self.searchterm)
         self.gui.clearsearchresults()
-
-    def certselect(self):
-        if self.gui.certselect.currentText() == 'AAA':
-            print ('Using AAA-root compromised certificate')
-            shutil.copyfile('.mitmproxy/mitmproxy-ca.pem.aaa', '.mitmproxy/mitmproxy-ca.pem')
-        else:
-            print ('Using G3-root compromised certificate')
-            shutil.copyfile('.mitmproxy/mitmproxy-ca.pem.g3', '.mitmproxy/mitmproxy-ca.pem')
 
     def updateapp(self):
         #print('updateapp: self.appname: "%s"' % self.appname)
@@ -498,20 +489,12 @@ class Example(QtCore.QObject):
     @QtCore.pyqtSlot()
     def compromisedtoggle(self):
         if self.gui.chkcompromised.isChecked():
-            print('Compromised Checked!')
-            if self.gui.certselect.currentText() == 'AAA':
-                print('Using AAA-root compromised certificate')
-                shutil.copyfile('.mitmproxy/mitmproxy-ca.pem.aaa', '.mitmproxy/mitmproxy-ca.pem')
-            else:
-                print('Using G3-root compromised certificate')
-                shutil.copyfile('.mitmproxy/mitmproxy-ca.pem.g3', '.mitmproxy/mitmproxy-ca.pem')
-            #self.worker.compromised = True
-            #self.gui.btncompromised.setEnabled(True)
+            print('Using combo-root eMudhra compromised certificate')
+            shutil.copyfile('.mitmproxy/mitmproxy-ca.pem.emudhra', '.mitmproxy/mitmproxy-ca.pem')
+
         else:
             print('Restoring self-signed mitmproxy certificate')
             shutil.copyfile('.mitmproxy/mitmproxy-ca.pem.orig', '.mitmproxy/mitmproxy-ca.pem')
-            #self.worker.compromised = False
-            #self.gui.btncompromised.setEnabled(False)
 
 
     @QtCore.pyqtSlot()
@@ -842,14 +825,6 @@ class Window(QWidget):
         self.chkcompromised.setToolTip(
             'Use compromised eMudhra intermediate certificate\nNot all platforms trust this chain.')
 
-        # 2. Create the dropdown
-        self.certselect = QComboBox()
-        self.certselect.addItems(["G3", "AAA"])
-        self.certselect.setEnabled(False) # Start disabled
-
-        # 3. Connect them: checking the box enables the dropdown
-        self.chkcompromised.toggled.connect(self.certselect.setEnabled)
-
         # Quick loop to apply the styling to all capture buttons at once
         for button in [self.btntcpdump, self.btnssl, self.btnfull]:
             button.setStyleSheet("text-align: left; padding-left: 10px;")
@@ -881,14 +856,6 @@ class Window(QWidget):
         row_full.addWidget(self.chkcompromised)
         row_full.addStretch(1)
         #row_full.addWidget(self.certselect)
-
-        # --- 4. CERT SELECTOR
-        row_certselect = QHBoxLayout()
-        row_certselect.addStretch(1)
-        row_certselect.addStretch(1)
-        row_certselect.addStretch(1)
-        row_certselect.addWidget(self.certselect)
-        row_certselect.addStretch(1)
         
         # ==============================================================================
         # THE FIX: Force all three buttons to be exactly the same width.
@@ -907,7 +874,6 @@ class Window(QWidget):
         layout.addRow(row_tcpdump)
         layout.addRow(row_verify)
         layout.addRow(row_full)
-        layout.addRow(row_certselect)
 
         layout.addRow(self.chkrewrite, self.btnrewrite)
         layout.addRow(self.btnstop)

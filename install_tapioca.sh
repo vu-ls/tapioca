@@ -732,6 +732,7 @@ while [ -z "$mitmproxy_ok" ]; do
       conda install -y sortedcontainers passlib certifi pyparsing click ruamel_yaml colorama pyopenssl
       $mypip install pyshark GitPython colorama
       $mypip install mitmproxy
+      $mypip install 'pyOpenSSL==24.2.1'
       if [ $? -ne 0 ]; then
         echo Trouble installing mitmproxy with $mypip. Retrying python install...
         rm -rf ~/miniconda

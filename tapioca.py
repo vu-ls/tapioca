@@ -821,7 +821,7 @@ class Window(QWidget):
         self.lblsearchfound = QLabel()
         self.lblsearchunprotfound = QLabel()
         self.lblsearchprotfound = QLabel()
-        self.chkcompromised = QCheckBox('Use compromised cert')
+        self.chkcompromised = QCheckBox('eMudhra cert')
         self.chkcompromised.setToolTip(
             'Use compromised eMudhra intermediate certificate\nNot all platforms trust this chain.')
 

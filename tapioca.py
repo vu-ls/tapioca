@@ -776,7 +776,7 @@ class Window(QWidget):
             'Select an existing session from the dropdown or type a new one')
         #self.leapp = QLineEdit()
         self.btntcpdump = QPushButton(
-            'Capture - All traffic with tcpdump')
+            'All traffic with tcpdump')
         self.btntcpdump.setToolTip(
             'Launch tcpdump to capture all traffic without interception')
         self.lbltcpdump = QLabel()
@@ -787,11 +787,11 @@ class Window(QWidget):
         self.btnrewrite.setToolTip(
             'Modify mitmproxy traffic rewriting rules')
         self.btnrewrite.setEnabled(False)
-        self.btnssl = QPushButton('Capture - Verify SSL validation')
+        self.btnssl = QPushButton('Verify SSL validation')
         self.btnssl.setToolTip(
             'Launch mitmproxy to capture HTTP(S) traffic with an invalid certificate')
         self.lblssltest = QLabel()
-        self.btnfull = QPushButton('Capture - Full HTTPS inspection')
+        self.btnfull = QPushButton('Full HTTPS inspection')
         self.btnfull.setToolTip(
             'Launch mitmproxy to capture HTTP(S) traffic with an installed certificate')
         self.lblfull = QLabel()
@@ -861,9 +861,9 @@ class Window(QWidget):
         # THE FIX: Force all three buttons to be exactly the same width.
         # This aligns your "COMPLETE" labels perfectly in a straight vertical line!
         # ==============================================================================
-        # 280 pixels is roughly wide enough to fit "Capture - Full HTTPS inspection" 
+        # 200 pixels is roughly wide enough to fit "Full HTTPS inspection" 
         # without clipping. Adjust this number up or down if text still clips.
-        BUTTON_WIDTH = 220 
+        BUTTON_WIDTH = 200 
         
         for button in [self.btntcpdump, self.btnssl, self.btnfull]:
                 button.setFixedWidth(BUTTON_WIDTH)

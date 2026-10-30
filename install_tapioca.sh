@@ -760,6 +760,7 @@ while [ -z "$mitmproxy_ok" ]; do
       # https://stackoverflow.com/questions/77213053/why-did-flask-start-failing-with-importerror-cannot-import-name-url-quote-fr
       sudo $mypip install markupsafe==2.0.1 "werkzeug<3.0"
       sudo $mypip install mitmproxy pyshark
+      sudo $mypip insatll 'pyOpenSSL==24.2.1'
       # Clean up old user-specific mitmproxy
       rm ~/.local/bin/mitm*
       
